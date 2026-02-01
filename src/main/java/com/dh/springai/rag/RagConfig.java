@@ -1,7 +1,10 @@
 package com.dh.springai.rag;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.DocumentTransformer;
+import org.springframework.ai.document.DocumentWriter;
 import org.springframework.ai.model.transformer.KeywordMetadataEnricher;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -34,4 +37,19 @@ public class RagConfig {
     public DocumentTransformer keyMetadataEnricher(ChatModel chatModel){
         return new KeywordMetadataEnricher(chatModel, 4);
     }
+
+    @Bean
+    public DocumentWriter jsonConsoleDocumentWriter(ObjectMapper objectMapper){
+        return documents -> {
+            System.out.println("====[INFO] Writing JSON Console document=======");
+            try{
+                System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(documents));
+            } catch (JsonProcessingException e){
+                throw new RuntimeException(e);
+            }
+            System.out.println("=========================================");
+        };
+    }
+
+
 }
